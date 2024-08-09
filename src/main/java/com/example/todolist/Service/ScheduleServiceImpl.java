@@ -8,6 +8,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -36,5 +39,20 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .password(schedule.getPassword())
                 .build();
         return scheduleResponseDto;
+    }
+
+    @Override
+    public List<Schedule> getSchedule(String writer, LocalDate modDate) {
+        if(writer != null && modDate != null) {
+            return scheduleRepository.findByWriterAndModDateOrderByModDateDesc(writer,modDate);
+        }
+        else if(writer != null) {
+            return scheduleRepository.findByWriterOrderByModDateDesc(writer);
+        }
+        else if(modDate != null) {
+            return scheduleRepository.findByModDateOrderByModDateDesc(modDate);
+        }
+        else
+            return scheduleRepository.findAllByOrderByModDateDesc();
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
@@ -19,11 +20,11 @@ public class BaseTime {
 
     @CreatedDate
     @Column(updatable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime regDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate regDate;
 
     @CreatedDate
     @LastModifiedDate
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime modDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate modDate;
 }
