@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
     @Query("select s from Schedule s where s.sid =:sid")
-    Optional<Schedule> findBysid(Long sid);
+    Optional<Schedule> findBySid(Long sid);
 }

@@ -1,11 +1,14 @@
 package com.example.todolist.Service;
 
 import com.example.todolist.Dto.Schedule.ScheduleRequestDto;
+import com.example.todolist.Dto.Schedule.ScheduleResponseDto;
 import com.example.todolist.Entity.Schedule;
 import com.example.todolist.Repository.ScheduleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional
@@ -21,5 +24,17 @@ public class ScheduleServiceImpl implements ScheduleService {
                     .password(scheduleRequestDto.getPassword())
                     .build();
             return scheduleRepository.save(schedule);
+    }
+
+    @Override
+    public ScheduleResponseDto readByScheduleId(Long sid) {
+        Schedule schedule = scheduleRepository.findBySid(sid).orElseThrow(()->new NoSuchElementException("해당 할일은 존재 하지 않습니다."));
+        ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.builder()
+                .sid(sid)
+                .task(schedule.getTask())
+                .writer(schedule.getWriter())
+                .password(schedule.getPassword())
+                .build();
+        return scheduleResponseDto;
     }
 }
