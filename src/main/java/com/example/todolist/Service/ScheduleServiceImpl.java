@@ -4,6 +4,8 @@ import com.example.todolist.Dto.Schedule.ScheduleRequestDto;
 import com.example.todolist.Dto.Schedule.ScheduleResponseDto;
 import com.example.todolist.Entity.Schedule;
 import com.example.todolist.Repository.ScheduleRepository;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,4 +53,13 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Schedule update(Long sid, ScheduleRequestDto scheduleRequestDto) {
+        Schedule schedule = scheduleRepository.findById(sid).orElseThrow(() -> new RuntimeException("일정을 찾을수 없습니다"));
+        if(!(schedule.getPassword().equals(scheduleRequestDto.getPassword()))){
+            throw new RuntimeException("비밀번호가 일치 하지 않습니다.");
+        }
+        Schedule update = schedule.updateSchedule(scheduleRequestDto.getTask(),scheduleRequestDto.getWriter());
+        return scheduleRepository.save(update);
+    }
 }

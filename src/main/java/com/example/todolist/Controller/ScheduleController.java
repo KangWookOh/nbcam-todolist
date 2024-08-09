@@ -40,4 +40,15 @@ public class ScheduleController {
         else
             return new ResponseEntity<>(schedules, HttpStatus.OK);
     }
+    @PutMapping("/update/{sid}")
+    public ResponseEntity<Schedule> updateSchedule(@PathVariable Long sid, @RequestBody ScheduleRequestDto scheduleRequestDto) {
+        try {
+            Schedule update = scheduleService.update(sid,scheduleRequestDto);
+            return new ResponseEntity<>(update, HttpStatus.OK);
+        }
+        catch (RuntimeException e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

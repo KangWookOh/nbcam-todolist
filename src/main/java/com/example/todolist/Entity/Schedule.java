@@ -1,5 +1,6 @@
 package com.example.todolist.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,14 +20,14 @@ public class Schedule extends BaseTime{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sid;
 
-    @NotBlank
+
     @Size(max = 200)
     private String task;
 
-    @NotBlank
+
     private String writer;
 
-    @NotBlank
+    @JsonIgnore
     private String password;
 
     @Builder
@@ -34,6 +35,14 @@ public class Schedule extends BaseTime{
         this.task = task;
         this.writer = writer;
         this.password = password;
+    }
+
+    public Schedule updateSchedule(String task,String writer){
+        return Schedule.builder()
+                .task(task)
+                .writer(writer)
+                .build();
+
     }
 
 }

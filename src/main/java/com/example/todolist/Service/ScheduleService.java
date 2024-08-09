@@ -12,4 +12,6 @@ public interface ScheduleService {
     Schedule createSchedule(ScheduleRequestDto scheduleRequestDto);
     ScheduleResponseDto readByScheduleId(Long sid);
     List<Schedule>getSchedule(String writer, LocalDate modDate);
+    Schedule update(Long sid,ScheduleRequestDto scheduleRequestDto);
+
 }

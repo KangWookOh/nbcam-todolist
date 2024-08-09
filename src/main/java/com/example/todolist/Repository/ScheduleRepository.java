@@ -16,4 +16,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
     List<Schedule> findByWriterOrderByModDateDesc(String writer);
     List<Schedule>findByModDateOrderByModDateDesc(LocalDate modDate);
     List<Schedule> findAllByOrderByModDateDesc();
+
+    
+
 }
