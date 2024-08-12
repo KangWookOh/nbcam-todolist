@@ -7,6 +7,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      globally_quoted_identifiers: true
+      ddl-auto: update
       properties:
         format_sql: true

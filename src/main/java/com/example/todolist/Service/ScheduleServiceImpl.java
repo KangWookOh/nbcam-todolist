@@ -4,14 +4,11 @@ import com.example.todolist.Dto.Schedule.ScheduleRequestDto;
 import com.example.todolist.Dto.Schedule.ScheduleResponseDto;
 import com.example.todolist.Entity.Schedule;
 import com.example.todolist.Repository.ScheduleRepository;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -21,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    LocalDate currentDate = LocalDate.now();
 
     @Override
     public Schedule createSchedule(ScheduleRequestDto scheduleRequestDto) {
@@ -34,12 +32,17 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleResponseDto readByScheduleId(Long sid) {
-        Schedule schedule = scheduleRepository.findBySid(sid).orElseThrow(() -> new NoSuchElementException("해당 할일은 존재 하지 않습니다."));
+        Schedule schedule = scheduleRepository.findById(sid);
+        if(schedule == null) {
+            throw new NoSuchElementException("일정이 존재 하지 않습니다");
+        }
         ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.builder()
                 .sid(sid)
                 .task(schedule.getTask())
                 .writer(schedule.getWriter())
                 .password(schedule.getPassword())
+                .regDate(schedule.getRegDate())
+                .modDate(schedule.getModDate())
                 .build();
         return scheduleResponseDto;
     }
@@ -54,12 +57,18 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedule update(Long sid, ScheduleRequestDto scheduleRequestDto) {
-        Schedule schedule = scheduleRepository.findById(sid).orElseThrow(() -> new RuntimeException("일정을 찾을수 없습니다"));
+    public Schedule updateTaskAndWriter(Long sid, ScheduleRequestDto scheduleRequestDto) {
+        Schedule schedule = scheduleRepository.findById(sid);
         if(!(schedule.getPassword().equals(scheduleRequestDto.getPassword()))){
             throw new RuntimeException("비밀번호가 일치 하지 않습니다.");
         }
-        Schedule update = schedule.updateSchedule(scheduleRequestDto.getTask(),scheduleRequestDto.getWriter());
-        return scheduleRepository.save(update);
+        schedule.updateSchedule(scheduleRequestDto.getTask(),scheduleRequestDto.getWriter());
+        return scheduleRepository.save(schedule);
+    }
+
+    @Override
+    public void deleteBySid(Long sid) {
+        Schedule schedule = scheduleRepository.findById(sid);
+        scheduleRepository.deleteById(sid);
     }
 }
