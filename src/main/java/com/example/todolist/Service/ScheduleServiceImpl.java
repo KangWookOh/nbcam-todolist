@@ -49,11 +49,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<Schedule> getSchedule(String writer, LocalDate modDate) {
-        return scheduleRepository.findAll().stream()
-                .filter(schedule -> writer == null || schedule.getWriter().equals(writer))
-                .filter(schedule -> modDate == null || schedule.getModDate().equals(modDate))
-                .sorted((s1, s2) -> s2.getModDate().compareTo(s1.getModDate()))
-                .collect(Collectors.toList());
+        return scheduleRepository.findByScheduleByWriterAndModDate(writer,modDate);
     }
 
     @Override
@@ -62,13 +58,23 @@ public class ScheduleServiceImpl implements ScheduleService {
         if(!(schedule.getPassword().equals(scheduleRequestDto.getPassword()))){
             throw new RuntimeException("비밀번호가 일치 하지 않습니다.");
         }
-        schedule.updateSchedule(scheduleRequestDto.getTask(),scheduleRequestDto.getWriter());
-        return scheduleRepository.save(schedule);
+        Schedule update = Schedule.builder()
+                .sid(sid)
+                .task(scheduleRequestDto.getTask())
+                .writer(scheduleRequestDto.getWriter())
+                .modDate(LocalDate.now())
+                .build();
+        return scheduleRepository.update(update);
     }
 
     @Override
     public void deleteBySid(Long sid) {
         Schedule schedule = scheduleRepository.findById(sid);
+        if(schedule == null){
+            throw new IllegalStateException("일정이 존재 하지 않습니다.");
+        }
         scheduleRepository.deleteById(sid);
+
+
     }
 }

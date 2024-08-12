@@ -1,21 +1,16 @@
 package com.example.todolist.Repository;
 
-import com.example.todolist.Dto.Schedule.ScheduleRequestDto;
 import com.example.todolist.Entity.Schedule;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,30 +57,39 @@ public class ScheduleRepository {
             return null;
         }
     }
+    public List<Schedule> findByScheduleByWriterAndModDate(String writer, LocalDate modDate) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM schedule WHERE 1=1");
+        List<String> params = new ArrayList<>();
+        if(writer != null){
+            sql.append(" AND writer = ?");
+            params.add(writer);
+        }
+        if(modDate != null){
+            sql.append(" AND mod_Date = ?");
+            params.add(String.valueOf(modDate));
+        }
+        sql.append(" ORDER BY mod_Date DESC");
 
-    public List<Schedule> findByWriterAndModDate(String writer, LocalDate modDate) {
-        String sql = "SELECT * FROM schedule WHERE writer = ? AND DATE(mod_date) = ? ORDER BY mod_date DESC";
-        return jdbcTemplate.query(sql, new Object[]{writer, modDate}, new ScheduleRowMapper());
+        return jdbcTemplate.query(sql.toString(),new ScheduleRowMapper(),params.toArray());
+
+
     }
 
-    public List<Schedule> findByWriter(String writer) {
-        String sql = "SELECT * FROM schedule WHERE writer = ? ORDER BY mod_date DESC";
-        return jdbcTemplate.query(sql, new Object[]{writer}, new ScheduleRowMapper());
-    }
-
-    public List<Schedule> findByModDate(LocalDate modDate) {
-        String sql = "SELECT * FROM schedule WHERE DATE(mod_date) = ? ORDER BY mod_date DESC";
-        return jdbcTemplate.query(sql, new Object[]{modDate}, new ScheduleRowMapper());
-    }
-
-    public List<Schedule> findAll() {
-        String sql = "SELECT * FROM schedule ORDER BY mod_date DESC";
-        return jdbcTemplate.query(sql, new ScheduleRowMapper());
-    }
-
-    public int update(Schedule schedule) {
+    public Schedule update(Schedule schedule) {
         String sql = "UPDATE schedule SET task = ?, writer = ?, mod_date = ? WHERE sid = ?";
-        return jdbcTemplate.update(sql, schedule.getTask(), schedule.getWriter(), schedule.getModDate(), schedule.getSid());
+        LocalDate currentTime =LocalDate.now();
+
+        // Schedule의 `modDate`를 업데이트하고 저장
+        jdbcTemplate.update(sql, schedule.getTask(), schedule.getWriter(), currentTime, schedule.getSid());
+
+        // 업데이트 후, 변경된 Schedule 객체를 반환
+        return Schedule.builder()
+                .sid(schedule.getSid())
+                .task(schedule.getTask())
+                .writer(schedule.getWriter())
+                .regDate(currentTime)
+                .modDate(currentTime)
+                .build();
     }
 
     public int deleteById(Long sid) {

@@ -32,7 +32,7 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.readByScheduleId(sid));
     }
     @GetMapping("/schedule")
-    public ResponseEntity<List<Schedule>> getSchedules(@RequestBody(required = false) String writer, @RequestBody(required = false)LocalDate modDate) {
+    public ResponseEntity<List<Schedule>> getSchedules(@RequestParam(required = false) String writer, @RequestParam(required = false)LocalDate modDate) {
         List<Schedule> schedules = scheduleService.getSchedule(writer, modDate);
         if(schedules.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -43,16 +43,18 @@ public class ScheduleController {
 
     @PutMapping("/update/{sid}")
     public ResponseEntity<Schedule> updateSchedule(@PathVariable Long sid, @RequestBody ScheduleRequestDto scheduleRequestDto) {
-
+        if(scheduleRequestDto.getPassword() == null || scheduleRequestDto.getPassword().isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
              Schedule update = scheduleService.updateTaskAndWriter(sid,scheduleRequestDto);
-             return new ResponseEntity<>(HttpStatus.OK);
+             return ResponseEntity.ok(update);
 
     }
 
     @DeleteMapping("/delete/{sid}")
     public ResponseEntity<Schedule> deleteSchedule(@PathVariable Long sid) {
         scheduleService.deleteBySid(sid);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
