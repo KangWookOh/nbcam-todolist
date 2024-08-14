@@ -8,14 +8,14 @@ public class ScheduleRequestDto {
 
     private String task;
 
-    private String writer;
-
     private String password;
 
+    private Long manager_id;
+
     @Builder
-    public ScheduleRequestDto(String task, String writer, String password) {
+    public ScheduleRequestDto(String task,String password,Long manager_id) {
         this.task = task;
-        this.writer = writer;
         this.password = password;
+        this.manager_id = manager_id;
     }
 }

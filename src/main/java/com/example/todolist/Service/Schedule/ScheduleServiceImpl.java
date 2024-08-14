@@ -1,59 +1,59 @@
-package com.example.todolist.Service;
+package com.example.todolist.Service.Schedule;
 
 import com.example.todolist.Dto.Schedule.ScheduleRequestDto;
 import com.example.todolist.Dto.Schedule.ScheduleResponseDto;
+import com.example.todolist.Entity.Manager;
 import com.example.todolist.Entity.Schedule;
-import com.example.todolist.Repository.ScheduleRepository;
-import jakarta.transaction.Transactional;
+import com.example.todolist.Repository.Manager.ManagerRepository;
+import com.example.todolist.Repository.Schedule.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
+
+    private final ManagerRepository managerRepository;
     LocalDate currentDate = LocalDate.now();
 
     @Override
     public Schedule createSchedule(ScheduleRequestDto scheduleRequestDto) {
         Schedule schedule = Schedule.builder()
                 .task(scheduleRequestDto.getTask())
-                .writer(scheduleRequestDto.getWriter())
                 .password(scheduleRequestDto.getPassword())
+                .manager_id(scheduleRequestDto.getManager_id())
                 .build();
-        return scheduleRepository.save(schedule);
+        return scheduleRepository.createSchedule(schedule);
     }
 
     @Override
     public ScheduleResponseDto readByScheduleId(Long sid) {
         Schedule schedule = scheduleRepository.findById(sid);
+        Manager manager = managerRepository.findById(schedule.getManager_id());
         if(schedule == null) {
             throw new NoSuchElementException("일정이 존재 하지 않습니다");
         }
-        ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.builder()
-                .sid(sid)
-                .task(schedule.getTask())
-                .writer(schedule.getWriter())
-                .password(schedule.getPassword())
-                .regDate(schedule.getRegDate())
-                .modDate(schedule.getModDate())
-                .build();
-        return scheduleResponseDto;
+        return ScheduleResponseDto.from(schedule,manager);
     }
 
     @Override
-    public List<Schedule> getSchedule(String writer, LocalDate modDate) {
-        return scheduleRepository.findByScheduleByWriterAndModDate(writer,modDate);
-    }
+    public Page<ScheduleResponseDto> getSchedule(String name, LocalDate modDate, Pageable pageable) {
+
+            Page<Schedule> schedules = scheduleRepository.findBySchedules(name,modDate,pageable);
+            return schedules.map(schedule -> ScheduleResponseDto.from(schedule,managerRepository.findById(schedule.getManager_id())));
+
+        }
 
     @Override
-    public Schedule updateTaskAndWriter(Long sid, ScheduleRequestDto scheduleRequestDto) {
+    public Schedule updateTaskAndManager_id(Long sid, ScheduleRequestDto scheduleRequestDto) {
         Schedule schedule = scheduleRepository.findById(sid);
         if(!(schedule.getPassword().equals(scheduleRequestDto.getPassword()))){
             throw new RuntimeException("비밀번호가 일치 하지 않습니다.");
@@ -61,20 +61,21 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule update = Schedule.builder()
                 .sid(sid)
                 .task(scheduleRequestDto.getTask())
-                .writer(scheduleRequestDto.getWriter())
-                .modDate(LocalDate.now())
+                .manager_id(scheduleRequestDto.getManager_id())
+                .modDate(Timestamp.valueOf(schedule.getModDate()).toLocalDateTime())
                 .build();
         return scheduleRepository.update(update);
     }
 
     @Override
-    public void deleteBySid(Long sid) {
-        Schedule schedule = scheduleRepository.findById(sid);
+    public Schedule deleteBySid(Long sid) {
+        Schedule schedule =scheduleRepository.findById(sid);
         if(schedule == null){
             throw new IllegalStateException("일정이 존재 하지 않습니다.");
         }
         scheduleRepository.deleteById(sid);
 
-
+        return schedule;
     }
 }
+
