@@ -4,6 +4,8 @@ import com.example.todolist.Dto.Schedule.ScheduleRequestDto;
 import com.example.todolist.Dto.Schedule.ScheduleResponseDto;
 import com.example.todolist.Entity.Manager;
 import com.example.todolist.Entity.Schedule;
+import com.example.todolist.Exception.InvalidPasswordException;
+import com.example.todolist.Exception.ScheduleNotFoundException;
 import com.example.todolist.Repository.Manager.ManagerRepository;
 import com.example.todolist.Repository.Schedule.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule schedule = scheduleRepository.findById(sid);
         Manager manager = managerRepository.findById(schedule.getManager_id());
         if(schedule == null) {
-            throw new NoSuchElementException("일정이 존재 하지 않습니다");
+            throw new ScheduleNotFoundException("일정이 존재 하지 않습니다");
         }
         return ScheduleResponseDto.from(schedule,manager);
     }
@@ -56,7 +58,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public Schedule updateTaskAndManager_id(Long sid, ScheduleRequestDto scheduleRequestDto) {
         Schedule schedule = scheduleRepository.findById(sid);
         if(!(schedule.getPassword().equals(scheduleRequestDto.getPassword()))){
-            throw new RuntimeException("비밀번호가 일치 하지 않습니다.");
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다");
         }
         Schedule update = Schedule.builder()
                 .sid(sid)
@@ -71,7 +73,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public Schedule deleteBySid(Long sid) {
         Schedule schedule =scheduleRepository.findById(sid);
         if(schedule == null){
-            throw new IllegalStateException("일정이 존재 하지 않습니다.");
+            throw new ScheduleNotFoundException("일정이 존재 하지 않습니다.");
         }
         scheduleRepository.deleteById(sid);
 
