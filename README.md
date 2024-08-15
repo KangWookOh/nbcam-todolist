@@ -7,4 +7,6 @@
 
 ## API명세서
 
+https://documenter.getpostman.com/view/21326036/2sA3s7hoNS#b347e5de-54a2-4e13-ae35-980988a33096
+
 ## schedule.sql

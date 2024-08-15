@@ -1,6 +1,7 @@
 package com.example.todolist.Repository.Schedule;
 
 import com.example.todolist.Entity.Schedule;
+import com.example.todolist.Exception.ScheduleNotFoundException;
 import com.example.todolist.Repository.Manager.ManagerRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -15,9 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 @Repository
@@ -54,6 +53,15 @@ public class ScheduleRepository {
                 .modDate(currentTime)
                 .build();
     }
+    public List<Schedule> findAll(){
+        String sql ="SELECT *FROM schedule";
+        try {
+            return jdbcTemplate.query(sql,new ScheduleRowMapper());
+        }
+        catch (EmptyResultDataAccessException e){
+            throw new NoSuchElementException("일정이 없습니다.");
+        }
+    }
 
     public Schedule findById(Long sid) {
         String sql ="SELECT *FROM schedule WHERE sid=?";
@@ -61,7 +69,7 @@ public class ScheduleRepository {
             return jdbcTemplate.queryForObject(sql,new ScheduleRowMapper(),sid);
 
         } catch (EmptyResultDataAccessException e){
-            return null;
+            throw new ScheduleNotFoundException("일정이 없습니다");
         }
     }
 

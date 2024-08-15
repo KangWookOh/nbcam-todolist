@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,12 +61,13 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/delete/{sid}")
-    public ResponseEntity<Schedule> deleteSchedule(@PathVariable Long sid) {
+    public ResponseEntity<List<Schedule>> deleteSchedule(@PathVariable Long sid) {
         if(scheduleService.readByScheduleId(sid) == null){
             throw new ScheduleNotFoundException("이미 삭제된 일정입니다.");
         }
         scheduleService.deleteBySid(sid);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        List<Schedule> remainingSchedules =scheduleRepository.findAll();
+        return new ResponseEntity<>(remainingSchedules,HttpStatus.OK);
     }
 
 }
