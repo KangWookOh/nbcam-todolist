@@ -2,6 +2,7 @@ package com.example.todolist.Entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.validation.constraints.Pattern;
 import jdk.jfr.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
