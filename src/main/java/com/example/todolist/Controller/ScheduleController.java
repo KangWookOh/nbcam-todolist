@@ -11,6 +11,7 @@ import com.example.todolist.Service.Schedule.ScheduleServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -24,6 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/schedule")
+@Slf4j
 public class ScheduleController {
 
     private final ScheduleServiceImpl scheduleService;
@@ -31,6 +33,7 @@ public class ScheduleController {
 
     @PostMapping("/register")
     public ResponseEntity<Schedule> register(@Valid @RequestBody ScheduleRequestDto scheduleRequestDto) {
+        log.info("Registering schedule: {}", scheduleRequestDto);
         return ResponseEntity.ok(scheduleService.createSchedule(scheduleRequestDto));
     }
 
@@ -39,6 +42,7 @@ public class ScheduleController {
         if(scheduleService.readByScheduleId(sid) == null ){
             throw new ScheduleNotFoundException("일정이 존재하지 않습니다.");
         }
+        log.info("Getting schedule: {}", sid);
         return ResponseEntity.ok(scheduleService.readByScheduleId(sid));
     }
     @GetMapping("/list")
@@ -47,6 +51,7 @@ public class ScheduleController {
                                                              @PageableDefault(page = 0, size = 10, sort = "modDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
        ScheduleListResponse scheduleListResponse = ScheduleListResponse.of(scheduleService.getSchedule(name,modDate,pageable));
+       log.info("Getting schedules: {}", scheduleListResponse);
        return ResponseEntity.ok(scheduleListResponse);
 
     }
@@ -57,6 +62,7 @@ public class ScheduleController {
             throw new InvalidPasswordException("비밀번호가 일치 하지 않습니다.");
         }
              Schedule update = scheduleService.updateTaskAndManager_id(sid,scheduleRequestDto);
+             log.info("Updating schedule: {}", update);
              return ResponseEntity.ok(update);
 
     }
@@ -68,6 +74,7 @@ public class ScheduleController {
         }
         scheduleService.deleteBySid(sid);
         List<Schedule> remainingSchedules =scheduleRepository.findAll();
+        log.info("Delete By info: {}",remainingSchedules);
         return new ResponseEntity<>(remainingSchedules,HttpStatus.OK);
     }
 

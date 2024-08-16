@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ManagerRepository managerRepository;
     LocalDate currentDate = LocalDate.now();
 
+    @Transactional
     @Override
     public Schedule createSchedule(ScheduleRequestDto scheduleRequestDto) {
         Schedule schedule = Schedule.builder()
@@ -53,7 +55,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             return schedules.map(schedule -> ScheduleResponseDto.from(schedule,managerRepository.findById(schedule.getManager_id())));
 
         }
-
+    @Transactional
     @Override
     public Schedule updateTaskAndManager_id(Long sid, ScheduleRequestDto scheduleRequestDto) {
         Schedule schedule = scheduleRepository.findById(sid);
@@ -69,6 +71,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.update(update);
     }
 
+    @Transactional
     @Override
     public Schedule deleteBySid(Long sid) {
         Schedule schedule =scheduleRepository.findById(sid);
