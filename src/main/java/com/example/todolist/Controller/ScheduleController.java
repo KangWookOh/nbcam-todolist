@@ -8,6 +8,7 @@ import com.example.todolist.Exception.InvalidPasswordException;
 import com.example.todolist.Exception.ScheduleNotFoundException;
 import com.example.todolist.Repository.Schedule.ScheduleRepository;
 import com.example.todolist.Service.Schedule.ScheduleServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class ScheduleController {
     private final ScheduleRepository scheduleRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<Schedule> register(@RequestBody ScheduleRequestDto scheduleRequestDto) {
+    public ResponseEntity<Schedule> register(@Valid @RequestBody ScheduleRequestDto scheduleRequestDto) {
         return ResponseEntity.ok(scheduleService.createSchedule(scheduleRequestDto));
     }
 
@@ -51,7 +52,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/update/{sid}")
-    public ResponseEntity<Schedule> updateSchedule(@PathVariable Long sid, @RequestBody ScheduleRequestDto scheduleRequestDto) {
+    public ResponseEntity<Schedule> updateSchedule(@Valid  @PathVariable Long sid, @RequestBody ScheduleRequestDto scheduleRequestDto) {
         if(scheduleRequestDto.getPassword() == null || scheduleRequestDto.getPassword().isEmpty()){
             throw new InvalidPasswordException("비밀번호가 일치 하지 않습니다.");
         }
