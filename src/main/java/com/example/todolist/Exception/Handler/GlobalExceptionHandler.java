@@ -1,9 +1,10 @@
-package com.example.todolist.Exception;
+package com.example.todolist.Exception.Handler;
 
+import com.example.todolist.Exception.InvalidPasswordException;
+import com.example.todolist.Exception.ScheduleNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice

@@ -8,10 +8,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 import static com.example.todolist.Util.UUIDUitls.generateShortUUID;
