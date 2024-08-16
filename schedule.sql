@@ -24,6 +24,7 @@ create table manager
 );
 
 ALTER TABLE `schedule` ADD CONSTRAINT `fk_manager` FOREIGN KEY (`manager_id`) REFERENCES `manager`(`mid`)
+
 // create Schedule
 INSERT INTO schedule (task,password,manager_id,reg_Date,mod_Date) VALUES (?,?,?,?,?)
 // Schedule findALL()
